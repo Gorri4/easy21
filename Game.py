@@ -1,6 +1,5 @@
 import random
-from State import *
-from MonteCarlo import *
+from State import State
 
 class Game:
     dealerSum = 0
@@ -15,9 +14,9 @@ class Game:
         global dealerSum
         global isStillPlayingDealer
         while(self.isStillPlayingDealer):
-            print('dealer sum: ', self.dealerSum)
+            #print('dealer sum: ', self.dealerSum)
             if(self.didBreak(self.dealerSum)):
-                print('Dealer Broke!')
+                #print('Dealer Broke!')
                 self.isStillPlayingDealer = False
                 break;
             else:
@@ -33,17 +32,17 @@ class Game:
             newCard = self.dealCard(False)
             if(newCard[0] == 'black'):
                 result = orgSum + newCard[1]
-                print(player,' hits black',newCard[1])
+                #print(player,' hits black',newCard[1])
             else:
                 result = orgSum - newCard[1]
-                print(player,' hits red',newCard[1])
+                #print(player,' hits red',newCard[1])
         else:
              if(player == 'dealer'):
-                 print('dealer sticks')
+                 #print('dealer sticks')
                  result = orgSum
                  self.isStillPlayingDealer = False
              else:
-                 print('player sticks')
+                 #print('player sticks')
                  result = orgSum
                  self.isStillPlayingPlayer = False
         return result
@@ -66,13 +65,15 @@ class Game:
             global dealerSum
             firstCard = self.dealCard(True)
             self.dealerSum = firstCard[1]
-            print('Dealer first car: ', self.dealerSum)
+            #print('Dealer first car: ', self.dealerSum)
+            return self.dealerSum
             
     def playerTakeFirstTurn(self):
             global playerSum
             firstCard = self.dealCard(True)
             self.playerSum = firstCard[1]
-            print('Player first car: ', self.playerSum)
+            #print('Player first car: ', self.playerSum)
+            return self.playerSum
             
     def didBreak(self,sum):
         if(sum > 21 or sum < 1):
@@ -100,9 +101,9 @@ class Game:
         currentState = State(self.dealerSum,self.playerSum,False)
         n=1
         while(not currentState.finished):
-            print('Skref nr.', n)
-            print('dealer',currentState.dealer)
-            print('player',currentState.player)
+            #print('Skref nr.', n)
+            #print('dealer',currentState.dealer)
+            #print('player',currentState.player)
             if(currentState.player < 17):
                 currentState,reward = self.step(currentState,'hit')
             else:
