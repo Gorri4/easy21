@@ -83,13 +83,13 @@ class Game:
         
     def checkResult(self):
         if(self.dealerSum > 21):
-            print('Player won')
+            #print('Player won')
             return 'player'
         elif(self.dealerSum > self.playerSum):
-            print('Dealer won')
+            #print('Dealer won')
             return 'dealer'
         else:
-            print('Player won')
+            #print('Player won')
             return 'player'
             
         
@@ -113,6 +113,7 @@ class Game:
     
     def step(self, state, action):
         nextState = state
+        #print('Before-->player:',nextState.player,' dealer:',nextState.dealer)
         reward = 0
         if(action == 'hit'):
             nextState.player = self.takeTurn('player',action,state.player)
@@ -128,5 +129,6 @@ class Game:
                 reward = -1
             else:
                 reward = 1
-        
+    
+        #print('After-->player:',nextState.player,' dealer:',nextState.dealer)
         return nextState,reward
