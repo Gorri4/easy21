@@ -1,5 +1,6 @@
 import random
 from State import State
+import copy
 
 class Game:
     dealerSum = 0
@@ -112,14 +113,16 @@ class Game:
         return reward       
     
     def step(self, state, action):
-        nextState = state
+        nextState = copy.deepcopy(state)
         #print('Before-->player:',nextState.player,' dealer:',nextState.dealer)
         reward = 0
         if(action == 'hit'):
-            nextState.player = self.takeTurn('player',action,state.player)
-            if(nextState.player > 21 or nextState.player < 1):
+            result = self.takeTurn('player',action,nextState.player)
+            if(result > 21 or result < 1):
                 nextState.finished = True
                 reward = -1
+            else:
+                nextState.player = result
         else:
             self.playerSum = nextState.player
             self.dealerSum = nextState.dealer

@@ -12,9 +12,9 @@ from matplotlib import cm
 class MonteCarlo:
     def __init__(self, n0):
         self.n0 = float(n0)
-        self.N = np.zeros((40,40,2))
-        self.Q = np.zeros((40,40,2))
-        self.V = np.zeros((40,40))
+        self.N = np.zeros((10,21,2))
+        self.Q = np.zeros((10,21,2))
+        self.V = np.zeros((10,21))
         
         self.wins = 0
         self.iterations = 0
@@ -84,7 +84,7 @@ class MonteCarlo:
         for d in range(10):
             for p in range(21):
                 self.V[d,p] = max(self.Q[d,p,:])
-                    
+        
     
     def playGame(self):
         game = Game()
@@ -110,14 +110,14 @@ class MonteCarlo:
         return yfrb
         
 
-monti = MonteCarlo(100)
+#monti = MonteCarlo(100)
 
-for i in range(10):
+'''for i in range(10):
     figure = plt.figure('image'+str(i))
     b = figure.add_subplot(111, projection='3d')
     monti.train(50000)
     b.clear()
     monti.plotImage(b)
-    
+   ''' 
 
 
