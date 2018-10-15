@@ -1,7 +1,6 @@
 from State import State
 from Game import Game
 
-
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -12,13 +11,15 @@ from matplotlib import cm
 class MonteCarlo:
     def __init__(self, n0):
         self.n0 = float(n0)
-        self.N = np.zeros((10,21,2))
-        self.Q = np.zeros((10,21,2))
-        self.V = np.zeros((10,21))
+        self.N = np.zeros((10,21,2)) #Stores the number of times a state is visited
+        self.Q = np.zeros((10,21,2)) #3 dimensional table containing values for each action
+        self.V = np.zeros((10,21)) #The value table containing action for each state
         
-        self.wins = 0
-        self.iterations = 0
-        
+        self.wins = 0 #Number of times a player has won
+        self.iterations = 0 #Number of iterations
+    
+    '''Handles the epsilon greedy exploration stratergy. The epsilon values gets smaller as the number of 
+       visits per state increases.'''
     def epsilonGreedy(self,state):
         
         visits = sum(self.N[state.dealer-1,state.player-1,:])
@@ -39,28 +40,29 @@ class MonteCarlo:
                 action = 'stick'
                 
         return action
-        
+    
+    '''This functions handles the training process of the MonteCarlo agent'''    
     def train(self, iterations):
         for rounds in range(iterations):
-            pairs = []
-            game = Game() 
+            pairs = [] #Stores all the states visited during each episode.
+            game = Game() #Create a instance of the game
             
-            currentState = State(game.dealerTakeFirstTurn(), game.playerTakeFirstTurn(),False)
             
-            while(not currentState.finished):
+            currentState = State(game.dealerTakeFirstTurn(), game.playerTakeFirstTurn(),False)#State after the first turn
+            
+            while(not currentState.finished): #While the players are still playing
+                
                 action = self.epsilonGreedy(currentState)
                 actionIndex = 0
                 
-                if(action == 'hit'):
+                if(action == 'hit'):    
                     actionIndex = 0
                 else:
                     actionIndex = 1
-                    
-                #print('player:',currentState.player,'dealer:',currentState.dealer,'playerAction:',action)
                 
                 pairs.append((currentState.player,currentState.dealer,actionIndex))
                     
-                self.N[currentState.dealer-1,currentState.player-1,actionIndex] += 1
+                self.N[currentState.dealer-1,currentState.player-1,actionIndex] += 1 
                 
                 currentState,reward = game.step(currentState,action)
                 
@@ -68,24 +70,25 @@ class MonteCarlo:
             self.wins = self.wins + 1 if reward == 1 else self.wins
             
             for player,dealer,action in pairs:
-                dealerInx = dealer-1
-                playerInx = player-1
-                actionInx = action
+                dealerIndex = dealer-1 #Sum of dealer in state
+                playerIndex = player-1 #Sum of player in state
+                actionIndex = action #Action taken in state
                 
-                step = 1.0 / self.N[dealerInx,playerInx,actionInx]
-                rwrd = reward - self.Q[dealerInx,playerInx,actionInx]
-                self.Q[dealerInx,playerInx,actionInx] += step*rwrd
+                step = 1.0 / self.N[dealerIndex,playerIndex,actionIndex]
+                rwrd = reward - self.Q[dealerIndex,playerIndex,actionIndex]
+                self.Q[dealerIndex,playerIndex,actionIndex] += step*rwrd
                 
                 
         self.iterations += iterations
         
-        #print(float(self.wins/self.iterations*100))
+        print('Precentage of wins during training:',float(self.wins/self.iterations*100)) #Prints out precentage of wins during training
             
         for d in range(10):
             for p in range(21):
                 self.V[d,p] = max(self.Q[d,p,:])
         
-    
+    '''Plays one game where MonteCarlo only looks up in Q table. Similar to when the agent has trained and the epsilon value
+       is very low. This function was only used in development'''
     def playGame(self):
         game = Game()
         currentState = State(game.dealerTakeFirstTurn(), game.playerTakeFirstTurn(),False)
@@ -100,24 +103,5 @@ class MonteCarlo:
             currentState,reward = game.step(currentState,action)
         
         return reward
-    
-    def plotImage(self, b):
-        X = np.arange(0, 10, 1)
-        Y = np.arange(0, 21, 1)
-        X, Y = np.meshgrid(X, Y)
-        Z = self.V[X,Y]
-        yfrb = b.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.Spectral, linewidth=0, antialiased=False)
-        return yfrb
-        
-
-#monti = MonteCarlo(100)
-
-'''for i in range(10):
-    figure = plt.figure('image'+str(i))
-    b = figure.add_subplot(111, projection='3d')
-    monti.train(50000)
-    b.clear()
-    monti.plotImage(b)
-   ''' 
 
 

@@ -33,6 +33,7 @@ def drawForAllLambdas():
         squareMean.append(squareMeanCalc)   
     fig = plt.figure("SARSA")
     surf = plt.plot(lambdas[1:10], squareMean[1:10])
+    fig.savefig('lambdaALL.png')
     plt.show()
 
 def drawForLambdaOne():
@@ -43,7 +44,7 @@ def drawForLambdaOne():
     lambdaValue = 1.0
     learningRate = []
     learningRateIndex = []
-    
+    print('Training SARSA and plotting graph')
     sarsa = SARSA(100,lambdaValue)
     for i in range(1000):
         learningRateIndex.append(i)
@@ -53,6 +54,7 @@ def drawForLambdaOne():
         
     fig = plt.figure("SARSAZERO")
     surf = plt.plot(learningRateIndex,learningRate)
+    fig.savefig('lambdaOne.png')
     plt.show()
 
 def drawForLambdaZero():
@@ -63,8 +65,8 @@ def drawForLambdaZero():
     lambdaValue = 0
     learningRate = []
     learningRateIndex = []
-    
     sarsa = SARSA(100,lambdaValue)
+    print('Training SARSA and plotting graph')
     for i in range(1000):
         learningRateIndex.append(i)
         sarsa.train(1)
@@ -73,7 +75,42 @@ def drawForLambdaZero():
         
     fig = plt.figure("SARSAZERO")
     surf = plt.plot(learningRateIndex,learningRate)
+    fig.savefig('lambdaZero.png')
     plt.show()
+    
+def plotMonte(b, monti):
+    b.clear()
+    X = np.arange(0, 10, 1)
+    Y = np.arange(0, 21, 1)
+    X, Y = np.meshgrid(X, Y)
+    Z = monti.V[X,Y]
+    yfrb = b.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.PuOr, linewidth=0, antialiased=False)
+    return yfrb
 
-drawForLambdaZero()
-drawForLambdaOne()
+def drawMonteCarlo():
+    iterations = [10, 100, 1000, 10000, 100000, 500000,1000000]
+    for iteration in iterations:
+        print('Creating Monte Carlo Agent...')
+        monti = MonteCarlo(100)
+        print('Monte Carlo created')
+        print('Training Monte Carlo for', iteration, 'iterations.')
+        monti.train(iteration)
+        print('Training completed, plotting image')
+        figure = plt.figure('Monte'+str(iteration))
+        b = figure.add_subplot(111, projection='3d')
+        resultfig = plotMonte(b, monti)
+        figure.savefig('MonteCarlo'+ str(iteration) + '.png')
+        plt.show()
+        
+def run():
+    print("Solution for Question 1 (Monte Carlo Optimal Value Function")
+    drawMonteCarlo()
+    print('Solution for Question 2 (Report mean-squared error for different lambdas)')
+    drawForAllLambdas()
+    print('Solution for Question 3 (Plot the learning curve of mean-squared error against episode number for lambda=1 and lambda=0.')
+    print('Lambda=1')
+    drawForLambdaOne()
+    print('Lambda=0')
+    drawForLambdaZero()
+    
+run()

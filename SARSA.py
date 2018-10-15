@@ -11,17 +11,19 @@ from State import State
 
 class SARSA:
     def __init__(self,n0,lambdaValue):
-        self.n0 = float(n0)
+        self.n0 = float(n0) 
         self.lambdaValue = lambdaValue
         
-        self.N = np.zeros((10,21,2))
-        self.Q = np.zeros((10,21,2))
-        self.V = np.zeros((10,21))
+        self.N = np.zeros((10,21,2)) #Number of times a state was visited
+        self.Q = np.zeros((10,21,2)) 
+        self.V = np.zeros((10,21)) 
         self.E = np.zeros((10,21,2))
         
         self.wins = 0
         self.iterations = 0
         
+        
+    '''Same function as the one in MonteCarlo.py'''
     def epsilonGreedy(self,state):
         
         visits = sum(self.N[state.dealer-1,state.player-1,:])
@@ -43,7 +45,7 @@ class SARSA:
                 
         return action
     
-    
+    '''This function handles the training of the SARSA agent'''
     def train(self,iterations):
 
         for rounds in range(iterations):
@@ -119,17 +121,3 @@ class SARSA:
         for d in range(10):
             for p in range(21):
                 self.V[d,p] = max(self.Q[d,p,:])
-
-
-    def plotImage(self, b):
-        X = np.arange(0, 10, 1)
-        Y = np.arange(0, 21, 1)
-        X, Y = np.meshgrid(X, Y)
-        Z = self.V[X,Y]
-        yfrb = b.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.Spectral, linewidth=0, antialiased=False)
-        return yfrb
-                
-                
-sarsa = SARSA(100,0.9)
-for i in range(10):
-    sarsa.train(50000)

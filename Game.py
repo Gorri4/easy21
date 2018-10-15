@@ -10,7 +10,8 @@ class Game:
     isStillPlayingDealer = True
     isStillPlayingPlayer = True
 
-        
+
+    '''Dealer plays until he decides to stick or goes over 21 or under 1. Returns the result from checkResult()'''
     def dealerPlay(self):
         global dealerSum
         global isStillPlayingDealer
@@ -27,6 +28,8 @@ class Game:
                     self.dealerSum = self.takeTurn('dealer', 'hit', self.dealerSum)
         return self.checkResult()
         
+    '''Players call this function to take turns. They send in their sum and their next action and it returns
+       their new sum'''
     def takeTurn(self, player, action, orgSum):
         result = 0
         if(action == 'hit'):
@@ -48,8 +51,7 @@ class Game:
                  self.isStillPlayingPlayer = False
         return result
         
-        
-        
+    '''Returns one card from 1-10 either black or red. If isFirstRound==true the function always returns a black card'''
     def dealCard(self,isFirstRound):
         randNumber = random.randint(1, 10)
         if(isFirstRound):
@@ -62,13 +64,15 @@ class Game:
                 color = 'red'
         return color,randNumber
     
+    '''Handles the dealers first turn'''
     def dealerTakeFirstTurn(self):
             global dealerSum
             firstCard = self.dealCard(True)
             self.dealerSum = firstCard[1]
             #print('Dealer first car: ', self.dealerSum)
             return self.dealerSum
-            
+    
+    '''Handles the players first turn'''
     def playerTakeFirstTurn(self):
             global playerSum
             firstCard = self.dealCard(True)
@@ -76,12 +80,14 @@ class Game:
             #print('Player first car: ', self.playerSum)
             return self.playerSum
             
+    '''Checks if player did break'''    
     def didBreak(self,sum):
         if(sum > 21 or sum < 1):
             return True
         else:
             return False
         
+    '''Checks which player won'''
     def checkResult(self):
         if(self.dealerSum > 21):
             #print('Player won')
@@ -93,7 +99,7 @@ class Game:
             #print('Player won')
             return 'player'
             
-        
+    '''Plays one game without Monte Carlo player. This function was only used in development'''
     def playOneGame(self):
         self.dealerTakeFirstTurn()
         self.playerTakeFirstTurn()
@@ -102,9 +108,6 @@ class Game:
         currentState = State(self.dealerSum,self.playerSum,False)
         n=1
         while(not currentState.finished):
-            #print('Skref nr.', n)
-            #print('dealer',currentState.dealer)
-            #print('player',currentState.player)
             if(currentState.player < 17):
                 currentState,reward = self.step(currentState,'hit')
             else:
@@ -112,9 +115,10 @@ class Game:
             n = n + 1
         return reward       
     
+    '''Step function takes in players current state and action and returns new state and new reward.
+       If player won then the reward is 1, the reward is -1 if he looses but 0 if neither player won'''
     def step(self, state, action):
         nextState = copy.deepcopy(state)
-        #print('Before-->player:',nextState.player,' dealer:',nextState.dealer)
         reward = 0
         if(action == 'hit'):
             result = self.takeTurn('player',action,nextState.player)
@@ -126,12 +130,11 @@ class Game:
         else:
             self.playerSum = nextState.player
             self.dealerSum = nextState.dealer
-            result = self.dealerPlay()
+            result = self.dealerPlay() #Dealer plays 
             nextState.finished = True
             if(result == 'dealer'):
                 reward = -1
             else:
                 reward = 1
     
-        #print('After-->player:',nextState.player,' dealer:',nextState.dealer)
         return nextState,reward
